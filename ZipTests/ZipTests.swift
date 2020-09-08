@@ -181,8 +181,9 @@ class ZipTests: XCTestCase {
             let imageURL2 = Bundle(for: ZipTests.self).url(forResource: "kYkLkPf", withExtension: "gif")!
             let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] as NSURL
             let zipFilePath = documentsFolder.appendingPathComponent("archive.zip")
-            try Zip.zipFiles(paths: [imageURL1, imageURL2], zipFilePath: zipFilePath!, password: nil, progress: { (progress) -> () in
+            try Zip.zipFiles(paths: [imageURL1, imageURL2], zipFilePath: zipFilePath!, password: nil, progress: { (progress) -> Bool in
                 print(progress)
+                return true
             })
             let fileManager = FileManager.default
             XCTAssertTrue(fileManager.fileExists(atPath:(zipFilePath?.path)!))
@@ -198,8 +199,9 @@ class ZipTests: XCTestCase {
             let imageURL2 = Bundle(for: ZipTests.self).url(forResource: "kYkLkPf", withExtension: "gif")!
             let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] as NSURL
             let zipFilePath = documentsFolder.appendingPathComponent("archive.zip")
-            try Zip.zipFiles(paths: [imageURL1, imageURL2], zipFilePath: zipFilePath!, password: "password", progress: { (progress) -> () in
+            try Zip.zipFiles(paths: [imageURL1, imageURL2], zipFilePath: zipFilePath!, password: "password", progress: { (progress) -> Bool in
                 print(progress)
+                return true
             })
             let fileManager = FileManager.default
             XCTAssertTrue(fileManager.fileExists(atPath:(zipFilePath?.path)!))

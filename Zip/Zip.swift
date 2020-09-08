@@ -262,7 +262,7 @@ public class Zip {
      
      - notes: Supports implicit progress composition
      */
-    public class func zipFiles(paths: [URL], zipFilePath: URL, password: String?, compression: ZipCompression = .DefaultCompression, progress: ((_ progress: Double) -> ())?) throws {
+    public class func zipFiles(paths: [URL], zipFilePath: URL, password: String?, compression: ZipCompression = .DefaultCompression, progress: ((_ progress: Double) -> Bool)?) throws {
         
         // File manager
         let fileManager = FileManager.default
@@ -298,6 +298,7 @@ public class Zip {
         progressTracker.kind = ProgressKind.file
         
         // Begin Zipping
+        var shouldContinue = true
         let zip = zipOpen(destinationPath, APPEND_STATUS_CREATE)
         for path in processedPaths {
             let filePath = path.filePath()
@@ -341,10 +342,10 @@ public class Zip {
                     length = fread(buffer, 1, chunkSize, input)
                     zipWriteInFileInZip(zip, buffer, UInt32(length))
                 }
-                
+
                 // Update progress handler
                 if let progressHandler = progress{
-                    progressHandler((currentPosition/totalSize))
+                    shouldContinue = progressHandler((currentPosition/totalSize))
                 }
                 
                 progressTracker.completedUnitCount = Int64(currentPosition)
@@ -352,9 +353,17 @@ public class Zip {
                 zipCloseFileInZip(zip)
                 free(buffer)
                 fclose(input)
+
+                if !shouldContinue {
+                    break
+                }
             }
         }
         zipClose(zip, nil)
+
+        if !shouldContinue {
+            try fileManager.removeItem(at: zipFilePath)
+        }
         
         // Completed. Update progress handler.
         if let progressHandler = progress{

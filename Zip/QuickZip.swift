@@ -85,7 +85,7 @@ extension Zip {
      
      - returns: NSURL of the destination folder.
      */
-    public class func quickZipFiles(_ paths: [URL], fileName: String, progress: ((_ progress: Double) -> ())?) throws -> URL {
+    public class func quickZipFiles(_ paths: [URL], fileName: String, progress: ((_ progress: Double) -> Bool)?) throws -> URL {
         let fileManager = FileManager.default
         let documentsUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0] as URL
         let destinationUrl = documentsUrl.appendingPathComponent("\(fileName).zip")
